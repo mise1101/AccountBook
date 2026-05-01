@@ -42,7 +42,7 @@ class MainActivity : ComponentActivity() {
 }
 
 private val tabScreens = listOf(
-    TabScreen("账单", Icons.AutoMirrored.Filled.List),
+    TabScreen("Account", Icons.AutoMirrored.Filled.List),
     TabScreen("统计", Icons.Default.BarChart)
 )
 

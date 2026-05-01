@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(New-Item *)",
+      "PowerShell(Get-ChildItem -Path \"D:\\\\projects\\\\AccountBook\\\\.kotlin\" -Recurse -Depth 2 | ForEach-Object { $_.FullName.Substring\\(\"D:\\\\projects\\\\AccountBook\".Length + 1\\) } | Sort-Object)",
+      "PowerShell(Get-ChildItem -Path \"D:\\\\projects\\\\AccountBook\\\\app\\\\src\\\\main\\\\java\" -Recurse -Depth 6 | ForEach-Object { $_.FullName.Substring\\(\\(\"D:\\\\projects\\\\AccountBook\\\\app\\\\src\\\\main\\\\java\".Length + 1\\)\\) } | Sort-Object)"
+    ]
+  }
+}

@@ -13,15 +13,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -45,7 +40,6 @@ import com.example.accountbook.data.entity.TransactionWithCategory
 import com.example.accountbook.viewmodel.MainViewModel
 import com.example.accountbook.viewmodel.TransactionFilter
 import java.text.SimpleDateFormat
-import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
@@ -56,11 +50,8 @@ fun HomeScreen(
     onAddClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val transactions by viewModel.transactions.collectAsState()
+    val transactions by viewModel.currentMonthTransactions.collectAsState()
     val filter by viewModel.filter.collectAsState()
-    val monthlyExpense by viewModel.monthlyExpense.collectAsState()
-    val monthlyIncome by viewModel.monthlyIncome.collectAsState()
-    val monthOffset by viewModel.currentMonthOffset.collectAsState()
 
     var showDeleteDialog by remember { mutableStateOf<TransactionWithCategory?>(null) }
 
@@ -88,16 +79,6 @@ fun HomeScreen(
                 .fillMaxSize()
                 .padding(padding)
         ) {
-            // Month selector and summary
-            MonthSelector(
-                monthOffset = monthOffset,
-                expense = monthlyExpense,
-                income = monthlyIncome,
-                onPrevious = { viewModel.previousMonth() },
-                onNext = { viewModel.nextMonth() },
-                onReset = { viewModel.resetMonth() }
-            )
-
             // Filter chips
             Row(
                 modifier = Modifier
@@ -126,7 +107,7 @@ fun HomeScreen(
             if (transactions.isEmpty()) {
                 Spacer(modifier = Modifier.weight(1f))
                 Text(
-                    text = if (monthOffset == 0) "还没有账单，点 + 记一笔吧" else "这个月没有账单",
+                    text = "本月还没有账单，点 + 记一笔吧",
                     modifier = Modifier.fillMaxWidth(),
                     textAlign = TextAlign.Center,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -172,82 +153,6 @@ fun HomeScreen(
                 }
             }
         )
-    }
-}
-
-@Composable
-private fun MonthSelector(
-    monthOffset: Int,
-    expense: Double,
-    income: Double,
-    onPrevious: () -> Unit,
-    onNext: () -> Unit,
-    onReset: () -> Unit
-) {
-    val cal = Calendar.getInstance()
-    cal.add(Calendar.MONTH, monthOffset)
-    val dateFormat = SimpleDateFormat("yyyy年MM月", Locale.CHINA)
-    val monthText = dateFormat.format(cal.time)
-
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            IconButton(onClick = onPrevious) {
-                Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, "上月")
-            }
-            Text(
-                text = monthText,
-                fontWeight = FontWeight.Bold,
-                fontSize = 18.sp,
-                modifier = Modifier
-                    .weight(1f)
-                    .clickable { onReset() },
-                textAlign = TextAlign.Center
-            )
-            IconButton(onClick = onNext) {
-                Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, "下月")
-            }
-        }
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text("支出", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
-                Text(
-                    text = formatAmount(expense),
-                    color = Color(0xFFE53935),
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp
-                )
-            }
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text("收入", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
-                Text(
-                    text = formatAmount(income),
-                    color = Color(0xFF43A047),
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp
-                )
-            }
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text("结余", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
-                val balance = income - expense
-                Text(
-                    text = formatAmount(balance),
-                    color = if (balance >= 0) Color(0xFF43A047) else Color(0xFFE53935),
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp
-                )
-            }
-        }
     }
 }
 

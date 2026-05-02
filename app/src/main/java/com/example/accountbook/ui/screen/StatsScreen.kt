@@ -16,9 +16,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -42,12 +44,11 @@ import com.example.accountbook.viewmodel.MainViewModel
 @Composable
 fun StatsScreen(
     viewModel: MainViewModel,
+    onSettingsClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val transactions by viewModel.transactions.collectAsState()
+    val transactions by viewModel.currentMonthTransactions.collectAsState()
     val expense by viewModel.monthlyExpense.collectAsState()
-    val income by viewModel.monthlyIncome.collectAsState()
-    val monthOffset by viewModel.currentMonthOffset.collectAsState()
 
     // Group by category for breakdown
     val expenseByCategory: List<Pair<Category, Double>> = transactions
@@ -62,6 +63,11 @@ fun StatsScreen(
         topBar = {
             TopAppBar(
                 title = { Text("统计", fontWeight = FontWeight.Bold) },
+                actions = {
+                    IconButton(onClick = onSettingsClick) {
+                        Icon(Icons.Default.Settings, contentDescription = "设置")
+                    }
+                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer
                 )
@@ -76,66 +82,6 @@ fun StatsScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Summary card
-            item {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer
-                    ),
-                    shape = RoundedCornerShape(16.dp)
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(20.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text(
-                            text = "月结余",
-                            color = MaterialTheme.colorScheme.onPrimaryContainer,
-                            fontSize = 14.sp
-                        )
-                        val balance = income - expense
-                        Text(
-                            text = formatAmount(balance),
-                            fontSize = 36.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = if (balance >= 0) Color(0xFF43A047) else Color(0xFFE53935)
-                        )
-
-                        Spacer(modifier = Modifier.height(16.dp))
-
-                        Row(modifier = Modifier.fillMaxWidth()) {
-                            Column(
-                                modifier = Modifier.weight(1f),
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                Text("收入", color = Color(0xFF43A047), fontSize = 13.sp)
-                                Text(
-                                    text = formatAmount(income),
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 18.sp,
-                                    color = Color(0xFF43A047)
-                                )
-                            }
-                            Column(
-                                modifier = Modifier.weight(1f),
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                Text("支出", color = Color(0xFFE53935), fontSize = 13.sp)
-                                Text(
-                                    text = formatAmount(expense),
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 18.sp,
-                                    color = Color(0xFFE53935)
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-
             // Expense breakdown
             if (expenseByCategory.isNotEmpty()) {
                 item {

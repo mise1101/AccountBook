@@ -26,20 +26,38 @@ class AppRepository(
     suspend fun updateCategory(category: Category) =
         categoryDao.update(category)
 
+    suspend fun updateCategories(categories: List<Category>) =
+        categoryDao.updateAll(categories)
+
     suspend fun deleteCategory(category: Category) =
         categoryDao.delete(category)
 
     val allTransactions: Flow<List<TransactionWithCategory>> =
         transactionDao.getAllWithCategory()
 
-    fun getTransactionsByType(type: String): Flow<List<TransactionWithCategory>> =
+    fun getTransactionsByType(
+        type: String
+    ): Flow<List<TransactionWithCategory>> =
         transactionDao.getByTypeWithCategory(type)
+
+    fun getTransactionsByTypeAndDateRange(
+        type: String, startMillis: Long, endMillis: Long
+    ): Flow<List<TransactionWithCategory>> =
+        transactionDao.getByTypeAndDateRangeWithCategory(type, startMillis, endMillis)
 
     fun getTransactionsByDateRange(
         startMillis: Long,
         endMillis: Long
     ): Flow<List<TransactionWithCategory>> =
         transactionDao.getByDateRangeWithCategory(startMillis, endMillis)
+
+    suspend fun getTransactionsByDateRangeSync(
+        startMillis: Long, endMillis: Long
+    ): List<TransactionWithCategory> =
+        transactionDao.getByDateRangeSync(startMillis, endMillis)
+
+    suspend fun getAllCategoriesSync(): List<Category> =
+        categoryDao.getAllSync()
 
     fun getTotalByTypeAndDate(
         type: String,

@@ -9,5 +9,6 @@ data class Category(
     val name: String,
     val icon: String = "",
     val type: String, // "EXPENSE" or "INCOME"
-    val isPredefined: Boolean = true
+    val isPredefined: Boolean = true,
+    val sortOrder: Int = 0
 )

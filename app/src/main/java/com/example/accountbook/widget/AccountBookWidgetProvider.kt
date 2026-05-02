@@ -7,8 +7,10 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.RemoteViews
+import android.graphics.Color
 import com.example.accountbook.MainActivity
 import com.example.accountbook.R
+import com.example.accountbook.util.WidgetPrefsManager
 
 class AccountBookWidgetProvider : AppWidgetProvider() {
 
@@ -39,6 +41,14 @@ class AccountBookWidgetProvider : AppWidgetProvider() {
 
         private fun buildRemoteViews(context: Context): RemoteViews {
             val views = RemoteViews(context.packageName, R.layout.widget_account_book)
+
+            val color = WidgetPrefsManager.getWidgetColor(context)
+            val text = WidgetPrefsManager.getWidgetText(context)
+
+            views.setInt(R.id.widget_root, "setBackgroundColor", color)
+            views.setTextViewText(R.id.widget_label, text)
+            views.setTextColor(R.id.widget_icon, Color.WHITE)
+            views.setTextColor(R.id.widget_label, Color.WHITE)
 
             val intent = Intent(context, MainActivity::class.java).apply {
                 action = ACTION_ADD_TRANSACTION

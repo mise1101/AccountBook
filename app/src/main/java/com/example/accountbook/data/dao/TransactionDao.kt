@@ -40,6 +40,24 @@ interface TransactionDao {
     @Update
     suspend fun update(transaction: Transaction)
 
+    @Query("""
+        SELECT * FROM transactions
+        WHERE type = :type AND date BETWEEN :startMillis AND :endMillis
+        ORDER BY date DESC, createdAt DESC
+    """)
+    fun getByTypeAndDateRangeWithCategory(
+        type: String, startMillis: Long, endMillis: Long
+    ): Flow<List<TransactionWithCategory>>
+
+    @Query("""
+        SELECT * FROM transactions
+        WHERE date BETWEEN :startMillis AND :endMillis
+        ORDER BY date DESC, createdAt DESC
+    """)
+    suspend fun getByDateRangeSync(
+        startMillis: Long, endMillis: Long
+    ): List<TransactionWithCategory>
+
     @Delete
     suspend fun delete(transaction: Transaction)
 }

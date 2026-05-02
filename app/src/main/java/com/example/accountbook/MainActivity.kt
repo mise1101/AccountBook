@@ -24,10 +24,12 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.accountbook.ui.screen.AddTransactionScreen
 import com.example.accountbook.ui.screen.CategoryManageScreen
 import com.example.accountbook.ui.screen.HomeScreen
+import com.example.accountbook.ui.screen.SettingsScreen
 import com.example.accountbook.ui.screen.StatsScreen
 import com.example.accountbook.ui.theme.AccountBookTheme
 import com.example.accountbook.viewmodel.MainViewModel
@@ -66,9 +68,13 @@ private data class TabScreen(val label: String, val icon: ImageVector)
 @Composable
 fun AccountBookApp(addRequestCount: State<Int>) {
     val viewModel: MainViewModel = viewModel()
+    val context = LocalContext.current
+    viewModel.initWidgetPrefs(context)
+
     var selectedTab by rememberSaveable { mutableIntStateOf(0) }
     var isAdding by rememberSaveable { mutableStateOf(false) }
     var isManagingCategories by rememberSaveable { mutableStateOf(false) }
+    var isSettings by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(addRequestCount.value) {
         if (addRequestCount.value > 0) {
@@ -76,7 +82,12 @@ fun AccountBookApp(addRequestCount: State<Int>) {
         }
     }
 
-    if (isManagingCategories) {
+    if (isSettings) {
+        SettingsScreen(
+            viewModel = viewModel,
+            onBack = { isSettings = false }
+        )
+    } else if (isManagingCategories) {
         CategoryManageScreen(
             viewModel = viewModel,
             onBack = { isManagingCategories = false }
@@ -110,6 +121,7 @@ fun AccountBookApp(addRequestCount: State<Int>) {
                 )
                 1 -> StatsScreen(
                     viewModel = viewModel,
+                    onSettingsClick = { isSettings = true },
                     modifier = Modifier.padding(innerPadding)
                 )
             }

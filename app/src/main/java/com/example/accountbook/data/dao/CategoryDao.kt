@@ -11,10 +11,10 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface CategoryDao {
-    @Query("SELECT * FROM categories ORDER BY type ASC, id ASC")
+    @Query("SELECT * FROM categories ORDER BY type ASC, sortOrder ASC, id ASC")
     fun getAll(): Flow<List<Category>>
 
-    @Query("SELECT * FROM categories WHERE type = :type ORDER BY id ASC")
+    @Query("SELECT * FROM categories WHERE type = :type ORDER BY sortOrder ASC, id ASC")
     fun getByType(type: String): Flow<List<Category>>
 
     @Query("SELECT * FROM categories WHERE id = :id")
@@ -28,6 +28,12 @@ interface CategoryDao {
 
     @Update
     suspend fun update(category: Category)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun updateAll(categories: List<Category>)
+
+    @Query("SELECT * FROM categories ORDER BY type ASC, sortOrder ASC, id ASC")
+    suspend fun getAllSync(): List<Category>
 
     @Delete
     suspend fun delete(category: Category)

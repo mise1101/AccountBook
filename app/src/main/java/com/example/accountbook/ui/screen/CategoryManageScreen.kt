@@ -73,11 +73,18 @@ fun CategoryManageScreen(
     // Drag state
     var draggedItemIndex by remember { mutableStateOf<Int?>(null) }
     var draggedOffset by remember { mutableFloatStateOf(0f) }
-    var orderedList by remember(categories) { mutableStateOf(categories) }
+    var orderedList by remember { mutableStateOf(categories) }
+    var isFromReorder by remember { mutableStateOf(false) }
 
-    // Keep orderedList in sync when categories change from external source
-    if (categories != orderedList && draggedItemIndex == null) {
-        orderedList = categories
+    // Sync orderedList when categories change externally (not from our own reorder).
+    // When isFromReorder is true, we skip the sync to avoid reverting a drag-in-progress
+    // before the DB write has completed.
+    if (categories != orderedList) {
+        if (!isFromReorder) {
+            orderedList = categories
+        }
+    } else {
+        isFromReorder = false
     }
 
     val itemHeightDp = 64.dp
@@ -170,11 +177,14 @@ fun CategoryManageScreen(
                                             val newIndex = (currentIndex + moveCount)
                                                 .coerceIn(0, orderedList.lastIndex)
                                             if (newIndex != currentIndex) {
+                                                val newList = orderedList.toMutableList()
                                                 Collections.swap(
-                                                    orderedList, currentIndex, newIndex
+                                                    newList, currentIndex, newIndex
                                                 )
+                                                orderedList = newList
                                                 draggedOffset -=
                                                     moveCount * itemHeightPx
+                                                isFromReorder = true
                                                 viewModel.reorderCategories(orderedList)
                                             }
                                         }

@@ -12,6 +12,7 @@
 /captures
 /.claude
 /CLAUDE.MD
+/demand.txt
 .externalNativeBuild
 .cxx
 local.properties

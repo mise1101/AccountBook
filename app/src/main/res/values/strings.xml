@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">AccountBook</string>
+    <string name="widget_description">一键打开记一笔页面</string>
 </resources>
